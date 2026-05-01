@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre o Studio – Kleber Mendes Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root { --red:#C8102E;--red-dark:#9b0d22;--black:#0a0a0a;--white:#ffffff;--gray-light:#f4f4f4;--gray-mid:#e0e0e0;--gray-text:#555; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(255,255,255,.97);border-bottom:1px solid var(--gray-mid);}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-logo-square{width:28px;height:28px;background:var(--red);border-radius:3px;}
+    .nav-logo span{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--black);}
+    .nav-links{display:flex;gap:36px;list-style:none;}
+    .nav-links a{text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--black);transition:color .2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--red);}
+    .nav-links a.active{border-bottom:2px solid var(--red);padding-bottom:2px;}
+    .nav-cta{background:transparent;color:var(--black);border:2px solid var(--black);padding:10px 24px;font-family:'Barlow',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .nav-cta:hover{background:var(--black);color:var(--white);}
+
+    /* HERO */
+    .sobre-hero{margin-top:64px;padding:100px 80px 60px;position:relative;overflow:hidden;}
+    .hero-bg-k{position:absolute;right:-60px;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',sans-serif;font-size:400px;color:rgba(0,0,0,.04);line-height:1;pointer-events:none;z-index:0;}
+    .badge{display:inline-block;background:var(--red);color:var(--white);font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:4px 12px;margin-bottom:24px;}
+    .sobre-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,6vw,88px);line-height:.95;position:relative;z-index:1;}
+    .sobre-hero h1 span{color:var(--red);}
+    .sobre-hero p{font-size:16px;color:var(--gray-text);line-height:1.7;max-width:520px;margin-top:24px;position:relative;z-index:1;}
+
+    /* BIO */
+    .bio-section{padding:80px 80px;display:grid;grid-template-columns:1fr 1.6fr;gap:80px;align-items:center;}
+    .bio-photo{position:relative;}
+    .bio-photo-frame{width:100%;aspect-ratio:3/4;background:linear-gradient(180deg,#1a1a1a,#2d2d2d);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .bio-photo-frame .initials{font-family:'Bebas Neue',sans-serif;font-size:120px;color:rgba(200,16,46,.2);}
+    .bio-years{position:absolute;bottom:0;left:0;background:var(--red);padding:16px 24px;}
+    .bio-years span{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;}
+    .bio-text .section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,3.5vw,52px);line-height:1.05;margin-bottom:24px;}
+    .bio-text .section-title span{color:var(--red);}
+    .bio-text p{font-size:15px;color:var(--gray-text);line-height:1.8;margin-bottom:20px;}
+    .bio-specs{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:2px solid var(--gray-mid);margin-top:32px;padding-top:24px;}
+    .spec-item h5{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:6px;}
+    .spec-item p{font-size:13px;font-weight:600;color:var(--black);}
+
+    /* ATMOSFERA */
+    .atmosfera{padding:80px 80px;background:var(--gray-light);}
+    .atmo-header{text-align:center;margin-bottom:60px;}
+    .atmo-header h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4vw,56px);}
+    .atmo-header p{font-size:14px;color:var(--gray-text);max-width:500px;margin:.5em auto 0;}
+    .atmo-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+    .atmo-card{position:relative;aspect-ratio:4/3;overflow:hidden;background:#1a1a1a;display:flex;align-items:flex-end;}
+    .atmo-card.tall{aspect-ratio:3/4;grid-row:span 2;}
+    .atmo-card-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+    .atmo-card-bg .icon{font-size:80px;opacity:.15;}
+    .atmo-overlay{position:relative;z-index:1;padding:24px;color:var(--white);background:linear-gradient(transparent,rgba(0,0,0,.7));}
+    .atmo-overlay h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--white);}
+    .atmo-overlay p{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;}
+
+    /* CTA */
+    .section-cta{background:var(--white);padding:100px 80px;text-align:center;}
+    .section-cta h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,5vw,72px);margin-bottom:16px;}
+    .section-cta h2 span{color:var(--red);}
+    .section-cta p{font-size:15px;color:var(--gray-text);max-width:560px;margin:.5em auto 40px;}
+    .cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+    .btn-primary{background:var(--red);color:var(--white);padding:14px 32px;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border:2px solid var(--red);transition:all .2s;}
+    .btn-primary:hover{background:var(--red-dark);border-color:var(--red-dark);}
+    .btn-outline{color:var(--black);padding:14px 32px;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border:2px solid var(--black);transition:all .2s;}
+    .btn-outline:hover{background:var(--black);color:var(--white);}
+
+    /* FOOTER */
+    footer{background:var(--black);border-top:1px solid rgba(255,255,255,.08);padding:60px 80px 40px;}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:60px;margin-bottom:40px;}
+    .footer-brand .logo-name{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);margin-bottom:16px;}
+    .footer-brand p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;max-width:260px;}
+    .footer-col h4{font-size:10px;font-weight:700;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:20px;}
+    .footer-col a{display:block;text-decoration:none;font-size:13px;color:rgba(255,255,255,.4);margin-bottom:10px;transition:color .2s;}
+    .footer-col a:hover{color:var(--white);}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:24px;display:flex;justify-content:space-between;align-items:center;}
+    .footer-bottom p{font-size:12px;color:rgba(255,255,255,.25);}
+    .status-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;display:inline-block;margin-right:6px;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @media(max-width:768px){
+      nav{padding:0 20px;} .nav-links{display:none;}
+      .sobre-hero{padding:60px 20px 40px;}
+      .bio-section{grid-template-columns:1fr;padding:40px 20px;}
+      .atmosfera{padding:60px 20px;} .atmo-grid{grid-template-columns:1fr;}
+      .atmo-card.tall{aspect-ratio:4/3;grid-row:auto;}
+      .section-cta{padding:60px 20px;}
+      footer{padding:40px 20px;} .footer-grid{grid-template-columns:1fr;gap:30px;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-square">KM</div>
+    <span>Kleber Mendes Studio</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Programs</a></li>
+    <li><a href="sobre.html" class="active">About</a></li>
+    <li><a href="resultados.html">Results</a></li>
+    <li><a href="contato.html">Contact</a></li>
+  </ul>
+  <a href="contato.html" class="nav-cta">Join Now</a>
+</nav>
+
+<section class="sobre-hero">
+  <div class="hero-bg-k">K</div>
+  <span class="badge">A Experiência Boutique</span>
+  <h1>MAIS QUE TREINO.<br>UMA <span>ASSINATURA</span><br>DE PERFORMANCE.</h1>
+  <p>Localizado no coração da cidade, o Kleber Mendes Studio redefine o conceito de treinamento personalizado através de uma abordagem cirúrgica e um ambiente de elite.</p>
+</section>
+
+<section class="bio-section">
+  <div class="bio-photo">
+    <div class="bio-photo-frame">
+      <div class="initials">KM</div>
+    </div>
+    <div class="bio-years"><span>Referência a mais de 15+ Anos</span></div>
+  </div>
+  <div class="bio-text">
+    <h2 class="section-title">CONHEÇA <span>KLEBER MENDES</span></h2>
+    <p>Fundador e mentor do estúdio, Kleber Mendes não é apenas um treinador; ele é um estrategista de performance. Com uma carreira dedicada ao estudo do movimento humano e biomecânica, ele desenvolveu uma metodologia que equilibra intensidade atlética e longevidade.</p>
+    <p>Sua visão para o estúdio nasceu da necessidade de um espaço que oferecesse mais do que equipamentos modernos: um ambiente onde cada repetição é monitorada e cada plano é verdadeiramente individual.</p>
+    <div class="bio-specs">
+      <div class="spec-item">
+        <h5>Especialidade</h5>
+        <p>Alta Performance &amp; Biomecânica</p>
+      </div>
+      <div class="spec-item">
+        <h5>Filosofia</h5>
+        <p>Precisão em Cada Movimento</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="atmosfera">
+  <div class="atmo-header">
+    <h2>A ATMOSFERA STUDIO</h2>
+    <p>Projetado para inspirar foco absoluto. Do design ao ambiente exclusivo, cada detalhe foi curado para a sua melhor versão.</p>
+  </div>
+  <div class="atmo-grid">
+    <div class="atmo-card tall" style="background:#111;">
+      <div class="atmo-card-bg"><div class="icon">🏋️</div></div>
+      <div class="atmo-overlay" style="width:100%;">
+        <h3>Ambiente Cirúrgico</h3>
+        <p>Equipamentos de última geração num layout focado em fluxo e performance.</p>
+      </div>
+    </div>
+    <div class="atmo-card" style="background:#1a1a1a;">
+      <div class="atmo-card-bg"><div class="icon">🎯</div></div>
+      <div class="atmo-overlay" style="width:100%;">
+        <h3>Atenção Individual</h3>
+        <p>Treinos privados onde você é a única prioridade do mentor.</p>
+      </div>
+    </div>
+    <div class="atmo-card" style="background:#1a1a1a;">
+      <div class="atmo-card-bg"><div class="icon">🥤</div></div>
+      <div class="atmo-overlay" style="width:100%;">
+        <h3>Fresh Fuel</h3>
+        <p>Sucos densos cortesia após cada sessão.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-cta">
+  <h2>PRONTO PARA <span>EVOLUIR?</span></h2>
+  <p>As vagas para consultoria individual com Kleber Mendes são limitadas para garantir o padrão de excelência. Agende sua avaliação hoje.</p>
+  <div class="cta-btns">
+    <a href="contato.html" class="btn-primary">Agendar Avaliação</a>
+    <a href="index.html" class="btn-outline">Ver Programas</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo-name">KLEBER MENDES STUDIO</div>
+      <p>Kinetic Pulse Performance. Onde a ciência bruta encontra um ambiente de elite.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Links</h4>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Studio Rules</a>
+    </div>
+    <div class="footer-col">
+      <h4>Social</h4>
+      <a href="#">Instagram</a>
+      <a href="#">YouTube</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 Kleber Mendes Studio. All Rights Reserved.</p>
+    <div><span class="status-dot"></span><span style="font-size:12px;color:rgba(255,255,255,.25);">Available for Sessions</span></div>
+  </div>
+</footer>
+
+</body>
+</html>
