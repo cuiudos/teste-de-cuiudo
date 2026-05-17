@@ -1,0 +1,11 @@
+# Nao publicar no Netlify (so roda no PC)
+server/
+iniciar-teste.bat
+iniciar-teste.ps1
+git/
+assets/
+
+# Arquivos de sessao Chrome (erro DIPS-wal no drag-and-drop)
+**/*.wal
+**/DIPS*
+server/data/

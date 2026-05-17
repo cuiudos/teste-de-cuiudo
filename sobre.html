@@ -13,7 +13,7 @@
     body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;}
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(255,255,255,.97);border-bottom:1px solid var(--gray-mid);}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-    .nav-logo-square{width:28px;height:28px;background:var(--red);border-radius:3px;}
+    .nav-logo img { width: 28px; height: 28px; object-fit: contain; }
     .nav-logo span{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--black);}
     .nav-links{display:flex;gap:36px;list-style:none;}
     .nav-links a{text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--black);transition:color .2s;}
@@ -96,7 +96,7 @@
 
 <nav>
   <a href="index.html" class="nav-logo">
-    <div class="nav-logo-square">KM</div>
+    <img src="logo.png" alt="Kleber Mendes Studio" style="height:28px;">
     <span>Kleber Mendes Studio</span>
   </a>
   <ul class="nav-links">
@@ -118,7 +118,7 @@
 <section class="bio-section">
   <div class="bio-photo">
     <div class="bio-photo-frame">
-      <div class="initials">KM</div>
+      <img src="kleber.png" alt="Kleber Mendes" style="width:100%;height:100%;object-fit:cover;">
     </div>
     <div class="bio-years"><span>Referência a mais de 15+ Anos</span></div>
   </div>

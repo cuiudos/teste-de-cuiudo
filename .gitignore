@@ -1,0 +1,23 @@
+# Ambiente local
+server/.env
+server/node_modules/
+server/.wwebjs_cache/
+
+# Sessao WhatsApp + Chrome (arquivos DIPS-wal quebram deploy Netlify)
+server/data/
+!server/data/.gitkeep
+
+# Locks / banco temporario do Chrome
+**/*.wal
+**/*.wal-journal
+**/DIPS*
+**/SingletonLock
+**/lockfile
+
+# Node
+node_modules/
+
+# Sistema / IDE
+.DS_Store
+Thumbs.db
+*.log

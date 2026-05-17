@@ -1,0 +1,31 @@
+# Evolution API — conecta o WhatsApp da recepção por QR Code (sem Meta)
+# Uso: docker compose -f docker-compose.evolution.yml up -d
+# Painel: http://localhost:8080/manager
+
+services:
+  evolution:
+    image: atendai/evolution-api:v2.2.3
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_URL: http://localhost:8080
+      AUTHENTICATION_API_KEY: troque-esta-chave-secreta
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://evolution:evolution@postgres:5432/evolution
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: evolution
+      POSTGRES_PASSWORD: evolution
+      POSTGRES_DB: evolution
+    volumes:
+      - evolution_pg:/var/lib/postgresql/data
+
+volumes:
+  evolution_pg:
