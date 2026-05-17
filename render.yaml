@@ -1,0 +1,17 @@
+# Render.com (gratis com limites: dorme apos inatividade)
+# Site estatico + API separada — para 24h gratis prefira Oracle (veja resposta no chat)
+services:
+  - type: web
+    name: km-studio-whatsapp
+    runtime: docker
+    rootDir: server
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: WHATSAPP_PROVIDER
+        value: local
+      - key: TOKEN_SECRETO
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://teste-kmstudio.netlify.app

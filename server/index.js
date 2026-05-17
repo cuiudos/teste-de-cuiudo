@@ -159,15 +159,6 @@ async function handleContact(req, res, origin) {
     );
   }
 
-  const studio = (process.env.STUDIO_WHATSAPP || '').replace(/\D/g, '');
-  const waText = encodeURIComponent(
-    `Ola! Sou ${lead.nome}. Vim pelo site KM Studio.\nInteresse: ${lead.servico || '-'}\nTel: ${lead.telefone}`
-  );
-  const wa_link =
-    !whatsapp.enviado && studio && provider !== 'local'
-      ? `https://wa.me/${studio}?text=${waText}`
-      : null;
-
   return sendJson(
     res,
     200,
@@ -176,9 +167,8 @@ async function handleContact(req, res, origin) {
       id: saved.id,
       whatsapp_enviado: whatsapp.enviado,
       mensagem: whatsapp.enviado
-        ? 'Pronto! Enviamos uma mensagem no seu WhatsApp. Confira o celular.'
+        ? 'Pronto! A recepcao enviou uma mensagem no seu WhatsApp. Confira o celular.'
         : 'Recebemos seu contato! Nossa equipe entrara em contato em breve.',
-      wa_link,
     },
     corsHeaders(origin)
   );
@@ -250,7 +240,7 @@ server.on('error', (err) => {
   throw err;
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   const provider = (process.env.WHATSAPP_PROVIDER || 'local').toLowerCase();
   console.log(`KM Studio — http://localhost:${PORT}`);
   console.log(`  Site:    http://localhost:${PORT}/contato.html`);

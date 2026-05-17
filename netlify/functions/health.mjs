@@ -1,12 +1,12 @@
 export default async () => {
-  const provider = (process.env.WHATSAPP_PROVIDER || 'evolution').toLowerCase();
-  const whatsapp =
-    provider === 'meta'
-      ? Boolean(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID)
-      : Boolean(
-          process.env.EVOLUTION_API_URL &&
-            process.env.EVOLUTION_INSTANCE &&
-            process.env.EVOLUTION_API_KEY
-        );
-  return Response.json({ ok: true, whatsapp, provider, ambiente: 'netlify' });
+  const bridge = Boolean(process.env.WHATSAPP_BRIDGE_URL);
+  return Response.json({
+    ok: true,
+    ambiente: 'netlify',
+    whatsapp_modo: 'recepcao_envia_para_cliente',
+    bridge_configurado: bridge,
+    mensagem: bridge
+      ? 'Site ligado ao PC da recepcao via ngrok'
+      : 'Configure WHATSAPP_BRIDGE_URL no Netlify',
+  });
 };

@@ -3,6 +3,7 @@ const LIMITE_SEGUNDOS = Number(process.env.LIMITE_SEGUNDOS || 60);
 const LIMITE_TENTATIVAS = Number(process.env.LIMITE_TENTATIVAS || 3);
 const JANELA_MS = 3600000;
 const MIN_FILL_MS = Number(process.env.MIN_FILL_MS || 3000);
+const BRIDGE = (process.env.WHATSAPP_BRIDGE_URL || '').replace(/\/$/, '');
 
 if (!globalThis.kmSpam) globalThis.kmSpam = {};
 if (!globalThis.kmBlacklist) globalThis.kmBlacklist = [];
@@ -27,7 +28,6 @@ function getClientIp(headers) {
       .split(',')[0]
       .trim() ||
     headers.get('x-nf-client-connection-ip') ||
-    headers.get('client-ip') ||
     'unknown'
   );
 }
@@ -46,8 +46,7 @@ function validateSubmission(body, ip) {
     return { blocked: true, motivo, status, ip, ...extra };
   }
 
-  const token = body._token || '';
-  if (token !== TOKEN_SECRETO) {
+  if ((body._token || '') !== TOKEN_SECRETO) {
     return bloquear('Token invalido');
   }
 
@@ -109,92 +108,22 @@ function validateSubmission(body, ip) {
   };
 }
 
-const WHATSAPP_PROVIDER = (process.env.WHATSAPP_PROVIDER || 'evolution').toLowerCase();
-
-function clientMessage(lead) {
-  return (
-    `Olá, ${lead.nome}! 👋\n\n` +
-    `Recebemos seu contato no *Kleber Mendes Studio*.\n` +
-    `Sobre: ${lead.servico || 'seu interesse'}\n\n` +
-    `Nossa recepção retorna em breve. Obrigado!\n\n— Equipe KM Studio`
-  );
-}
-
-function studioMessage(lead) {
-  return (
-    `🆕 *Novo lead — site*\n\n` +
-    `*Nome:* ${lead.nome}\n*WhatsApp:* ${lead.telefone}\n` +
-    `*E-mail:* ${lead.email || '—'}\n*Interesse:* ${lead.servico || '—'}\n` +
-    `*Mensagem:*\n${lead.mensagem || '—'}`
-  );
-}
-
-function formatEvolutionNumber(digits) {
-  const n = String(digits || '').replace(/\D/g, '');
-  const suffix = process.env.EVOLUTION_NUMBER_SUFFIX || '@s.whatsapp.net';
-  if (!n) return '';
-  return suffix.startsWith('@') ? `${n}${suffix}` : n;
-}
-
-async function sendEvolutionText(toDigits, text) {
-  const base = (process.env.EVOLUTION_API_URL || '').replace(/\/$/, '');
-  const instance = process.env.EVOLUTION_INSTANCE || '';
-  const key = process.env.EVOLUTION_API_KEY || '';
-  if (!base || !instance || !key) {
-    return { ok: false, skipped: true, reason: 'Evolution nao configurada' };
-  }
-
-  const res = await fetch(`${base}/message/sendText/${encodeURIComponent(instance)}`, {
+async function forwardToBridge(body, headerToken) {
+  const res = await fetch(`${BRIDGE}/api/contato`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', apikey: key },
-    body: JSON.stringify({ number: formatEvolutionNumber(toDigits), text }),
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Secret-Token': headerToken || body._token || TOKEN_SECRETO,
+      'ngrok-skip-browser-warning': 'true',
+    },
+    body: JSON.stringify(body),
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) console.error('[Evolution]', data);
-  return { ok: res.ok, data };
-}
 
-async function sendMetaText(toDigits, text) {
-  const token = process.env.WHATSAPP_TOKEN;
-  const phoneId = process.env.WHATSAPP_PHONE_ID;
-  if (!token || !phoneId) return { ok: false, skipped: true };
-
-  const res = await fetch(`https://graph.facebook.com/v21.0/${phoneId}/messages`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to: toDigits,
-      type: 'text',
-      text: { body: text },
-    }),
+  const text = await res.text();
+  return new Response(text, {
+    status: res.status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS },
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) console.error('[Meta]', data);
-  return { ok: res.ok, data };
-}
-
-async function sendText(toDigits, text) {
-  if (WHATSAPP_PROVIDER === 'meta') return sendMetaText(toDigits, text);
-  return sendEvolutionText(toDigits, text);
-}
-
-function isWhatsAppConfigured() {
-  if (WHATSAPP_PROVIDER === 'meta') {
-    return Boolean(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID);
-  }
-  return Boolean(
-    process.env.EVOLUTION_API_URL &&
-      process.env.EVOLUTION_INSTANCE &&
-      process.env.EVOLUTION_API_KEY
-  );
-}
-
-async function notifyLead(lead) {
-  const studio = (process.env.STUDIO_WHATSAPP || '').replace(/\D/g, '');
-  const client = await sendText(lead.telefone, clientMessage(lead));
-  const studioResult = studio ? await sendText(studio, studioMessage(lead)) : null;
-  return { client, studio: studioResult, provider: WHATSAPP_PROVIDER };
 }
 
 export default async (req) => {
@@ -228,30 +157,24 @@ export default async (req) => {
     });
   }
 
-  const lead = result.data;
-  const id = `lead_${Date.now()}`;
-  console.log('[LEAD]', JSON.stringify({ id, ...lead, recebidoEm: new Date().toISOString() }));
+  console.log('[LEAD]', JSON.stringify({ ...result.data, recebidoEm: new Date().toISOString() }));
 
-  let whatsappEnviado = false;
-  try {
-    const wa = await notifyLead(lead);
-    whatsappEnviado = Boolean(wa.client?.ok || wa.studio?.ok);
-  } catch (err) {
-    console.error('[WhatsApp]', err);
+  if (!BRIDGE) {
+    return json(503, {
+      ok: false,
+      erro:
+        'Envio automatico da recepcao indisponivel. Configure WHATSAPP_BRIDGE_URL no Netlify (ngrok + iniciar-teste.bat no PC).',
+    });
   }
 
-  const studio = (process.env.STUDIO_WHATSAPP || '5531999999999').replace(/\D/g, '');
-  const waText = encodeURIComponent(
-    `Ola! Sou ${lead.nome}. Vim pelo site KM Studio.\nInteresse: ${lead.servico || '-'}\nTel: ${lead.telefone}`
-  );
-  const wa_link = !whatsappEnviado && studio ? `https://wa.me/${studio}?text=${waText}` : null;
-
-  return json(200, {
-    ok: true,
-    id,
-    mensagem: whatsappEnviado
-      ? 'Recebemos seu contato! Voce recebera uma mensagem no WhatsApp em instantes.'
-      : 'Recebemos seu contato! Clique abaixo para falar com a recepcao no WhatsApp.',
-    wa_link,
-  });
+  try {
+    return await forwardToBridge(body, headerToken);
+  } catch (err) {
+    console.error('[Bridge]', err);
+    return json(503, {
+      ok: false,
+      erro:
+        'Servidor da recepcao offline. No PC: rode iniciar-teste.bat e mantenha o ngrok ativo.',
+    });
+  }
 };

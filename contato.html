@@ -147,7 +147,6 @@
         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
       </div>
       <p id="formFeedback" role="status" aria-live="polite" style="margin-top:14px;font-size:14px;color:var(--gray-text);"></p>
-      <a id="waLinkBtn" href="#" target="_blank" rel="noopener" class="btn-primary" style="display:none;margin-top:12px;">Abrir WhatsApp (alternativa)</a>
     </form>
   </div>
 
@@ -211,15 +210,11 @@
 
 <script>
   const TOKEN_SECRETO     = 'KM2025STUDIO';
-  // Envio automatico pelo WhatsApp da recepcao exige o servidor Node rodando.
-  // No Netlify: deixe vazio e use http://localhost:3000/contato.html para testar.
-  // Ou cole aqui a URL do ngrok (ex: https://xxxx.ngrok-free.app) apontando para o seu PC.
-  const WHATSAPP_API_HOST = '';
-  const isLocal           = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  const API_BASE          = WHATSAPP_API_HOST
-    ? WHATSAPP_API_HOST.replace(/\/$/, '')
-    : (isLocal && location.port !== '3000' ? `http://${location.hostname}:3000` : '');
-  const API_URL           = `${API_BASE}/api/contato`;
+  // A RECEPCAO envia WhatsApp para o cliente (nao o contrario).
+  // Local: servidor em localhost:3000 | Netlify: usa /api/contato + WHATSAPP_BRIDGE_URL no painel
+  const isLocal  = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const API_BASE = isLocal && location.port !== '3000' ? `http://${location.hostname}:3000` : '';
+  const API_URL  = `${API_BASE}/api/contato`;
   const LAST_SEND_KEY     = 'km_last_send';
   const SEND_COOLDOWN_MS  = 60 * 1000;
   const MIN_FILL_MS       = 3000;
@@ -228,7 +223,6 @@
   const contactForm  = document.getElementById('contactForm');
   const submitBtn    = document.getElementById('submitBtn');
   const formFeedback = document.getElementById('formFeedback');
-  const waLinkBtn    = document.getElementById('waLinkBtn');
 
   function normalizePhoneBR(phone) {
     const digits = String(phone || '').replace(/\D/g, '');
@@ -312,13 +306,7 @@
         return;
       }
 
-      showFeedback(`✅ ${json.mensagem || 'Enviado com sucesso!'}`, '#15803d');
-      if (json.wa_link) {
-        waLinkBtn.href = json.wa_link;
-        waLinkBtn.style.display = 'inline-block';
-      } else {
-        waLinkBtn.style.display = 'none';
-      }
+      showFeedback(`✅ ${json.mensagem || 'A recepcao enviou mensagem no seu WhatsApp!'}`, '#15803d');
       contactForm.reset();
       localStorage.setItem(LAST_SEND_KEY, String(Date.now()));
     } catch (err) {
