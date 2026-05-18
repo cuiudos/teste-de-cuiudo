@@ -114,9 +114,11 @@ async function forwardToBridge(body, headerToken) {
     headers: {
       'Content-Type': 'application/json',
       'X-Secret-Token': headerToken || body._token || TOKEN_SECRETO,
+      'X-Bridge-Proxy': 'netlify',
       'ngrok-skip-browser-warning': 'true',
     },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(25000),
   });
 
   const text = await res.text();
@@ -163,7 +165,7 @@ export default async (req) => {
     return json(503, {
       ok: false,
       erro:
-        'Envio automatico da recepcao indisponivel. Configure WHATSAPP_BRIDGE_URL no Netlify (ngrok + iniciar-teste.bat no PC).',
+        'Configure WHATSAPP_BRIDGE_URL no Netlify (URL do abrir-tunel.bat + iniciar-teste.bat no PC).',
     });
   }
 
@@ -174,7 +176,7 @@ export default async (req) => {
     return json(503, {
       ok: false,
       erro:
-        'Servidor da recepcao offline. No PC: rode iniciar-teste.bat e mantenha o ngrok ativo.',
+        'Servidor da recepcao offline. No PC: rode iniciar-teste.bat e abrir-tunel.bat (cloudflare) e confira a URL no Netlify.',
     });
   }
 };

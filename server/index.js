@@ -128,6 +128,29 @@ async function handleContact(req, res, origin) {
 
   const lead = result.data;
   const saved = saveLead(lead);
+  const viaBridge = req.headers['x-bridge-proxy'] === 'netlify';
+
+  // Netlify expira em ~10s — responde rapido e envia WhatsApp em segundo plano
+  if (viaBridge) {
+    notifyLead(lead)
+      .then((wa) => {
+        if (wa.client?.ok) console.log('[WhatsApp] Enviado para', lead.telefone);
+        else console.error('[WhatsApp] Falha:', wa.client?.error || wa.client?.reason);
+      })
+      .catch((err) => console.error('[notifyLead]', err));
+
+    return sendJson(
+      res,
+      200,
+      {
+        ok: true,
+        id: saved.id,
+        mensagem:
+          'Recebemos seu contato! A recepcao enviara uma mensagem no seu WhatsApp em instantes.',
+      },
+      corsHeaders(origin)
+    );
+  }
 
   const provider = (process.env.WHATSAPP_PROVIDER || 'local').toLowerCase();
   let whatsapp = { enviado: false, motivo: '' };
