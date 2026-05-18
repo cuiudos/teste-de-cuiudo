@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -301,7 +301,9 @@
           ? 'Servidor nao encontrado. Rode iniciar-teste.bat e abra http://localhost:3000/contato.html'
           : res.status === 503
           ? json.erro
-          : `Erro ${res.status}. Verifique se o servidor esta rodando (iniciar-teste.bat).`);
+          : res.status === 530 || res.status === 502
+          ? 'Tunel Cloudflare offline. Feche abrir-tunel.bat, abra de novo, espere conectar sem erro, atualize a URL no Netlify.'
+          : `Erro ${res.status}. Verifique iniciar-teste.bat e abrir-tunel.bat.`);
         showFeedback(`❌ ${msg}${wait}`, '#C8102E');
         return;
       }
